@@ -1,16 +1,9 @@
 package models
 
 import (
-	"net/http"
+	"time"
 
-	"github.com/gin-gonic/gin"
-	//"github.com/astaxie/beego/validation"
-	"github.com/Unknwon/com"
-
-	"gin-blog/pkg/e"
-	"gin-blog/models"
-	"gin-blog/pkg/util"
-	"gin-blog/pkg/setting"
+	"github.com/jinzhu/gorm"
 )
 
 type Tag struct {
@@ -31,4 +24,59 @@ func GetTagTotal(maps interface {}) (count int) {
 	db.Model(&Tag{}).Where(maps).Count(&count)
 
 	return
+}
+
+func ExistTagByName(name string) bool {
+	var tag Tag
+	db.Select("id").Where("name = ?", name).First(&tag)
+
+	if tag.ID > 0 {
+		return true
+	}
+
+	return false
+}
+
+func AddTag(name string, state int, createdBy string) bool {
+	db.Create(&Tag {
+		Name: name,
+		State: state,
+		CreatedBy: createdBy,
+	})
+
+	return true
+}
+
+func ExistTagByID(id int) bool {
+	var tag Tag
+	db.Select("id").Where("id = ?", id).First(&tag)
+	if tag.ID > 0 {
+		return true
+	}
+
+	return false
+}
+
+func DeleteTag(id int) bool {
+	db.Where("id = ?", id).Delete(&Tag{})
+
+	return true
+}
+
+func EditTag(id int, data interface {}) bool {
+	db.Model(&Tag{}).Where("id = ?", id).Updates(data)
+
+	return true
+}
+
+func (tag *Tag) BeforeCreate(scope *gorm.Scope) error {
+	scope.SetColumn("CreateOn", time.Now().Unix())
+
+	return nil
+}
+
+func (tag *Tag) BeforeUpdate(scope *gorm.Scope) error {
+	scope.SetColumn("ModiffiedOn", time.Now().Unix())
+
+	return nil
 }

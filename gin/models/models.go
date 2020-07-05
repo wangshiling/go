@@ -7,7 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
-	"github.com/EDDYCJY/go-gin-example/pkg/setting"
+	"gin/pkg"
 )
 
 var db *gorm.DB
@@ -26,7 +26,7 @@ func init() {
 
 	sec, err := setting.Cfg.GetSection("database")
 	if err != nil {
-		log.Fatalf(2, "Fail to get section 'database': %v", err)
+		log.Fatalf("Fail to get section 'database': %v", err)
 	}
 
 	dbType = sec.Key("TYPE").String()
